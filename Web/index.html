@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0f14" />
+    <meta
+      name="description"
+      content="AERODRIVE — an open-world 3D driving simulator that runs in your browser."
+    />
+    <title>AERODRIVE</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <!-- ===================== 3D VIEWPORT ===================== -->
+    <canvas id="game-canvas" aria-label="AERODRIVE game viewport" tabindex="-1"></canvas>
+
+    <!-- ===================== LOADING ===================== -->
+    <div id="loading-screen" class="overlay overlay--opaque" role="status" aria-live="polite">
+      <div class="loading__inner">
+        <h1 class="brand">
+          <span class="brand__mark" aria-hidden="true">AERODRIVE</span>
+          <span class="visually-hidden">AERODRIVE</span>
+        </h1>
+        <p id="loading-label" class="loading__label">Booting engine…</p>
+        <div class="progress" role="progressbar" aria-labelledby="loading-label">
+          <div id="loading-bar" class="progress__bar" style="width: 0%"></div>
+        </div>
+        <p id="loading-hint" class="loading__hint"></p>
+      </div>
+    </div>
+
+    <!-- ===================== MAIN MENU ===================== -->
+    <div id="screen-main" class="overlay screen" hidden>
+      <div class="menu">
+        <header class="menu__header">
+          <h1 class="brand brand--lg"><span class="brand__mark">AERODRIVE</span></h1>
+          <p class="menu__tagline" id="brand-tagline">Open-world driving simulator</p>
+        </header>
+        <nav class="menu__nav" aria-label="Main menu">
+          <button class="btn btn--primary" data-action="quick-drive" data-autofocus>Play</button>
+          <button class="btn" data-action="free-roam">Free Roam</button>
+          <button class="btn" data-action="open-maps">Maps</button>
+          <button class="btn" data-action="open-garage">Vehicles</button>
+          <button class="btn" data-action="open-challenges">Challenges</button>
+          <button class="btn" data-action="open-settings">Settings</button>
+          <button class="btn" data-action="open-credits">Credits</button>
+        </nav>
+        <footer class="menu__footer">
+          <span id="menu-status" class="menu__status"></span>
+          <span class="menu__build">v<span id="app-version">0.1.0</span></span>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ===================== GARAGE ===================== -->
+    <div id="screen-garage" class="overlay screen" hidden>
+      <div class="panel panel--wide">
+        <header class="panel__header">
+          <h2>Garage</h2>
+          <button class="btn btn--ghost" data-action="back">Back</button>
+        </header>
+        <div class="garage">
+          <ul id="garage-list" class="garage__list" role="listbox" aria-label="Vehicles"></ul>
+          <div class="garage__detail">
+            <h3 id="garage-name">—</h3>
+            <p id="garage-class" class="muted"></p>
+            <dl id="garage-specs" class="specs"></dl>
+            <fieldset class="paint">
+              <legend>Paint</legend>
+              <div id="garage-paints" class="paint__swatches"></div>
+            </fieldset>
+            <div class="garage__actions">
+              <button class="btn btn--primary" data-action="drive-vehicle">
+                Drive this vehicle
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== MAPS ===================== -->
+    <div id="screen-maps" class="overlay screen" hidden>
+      <div class="panel panel--wide">
+        <header class="panel__header">
+          <h2>Maps</h2>
+          <button class="btn btn--ghost" data-action="back">Back</button>
+        </header>
+        <ul id="maps-list" class="cards" role="listbox" aria-label="Maps"></ul>
+        <div class="dialog__actions">
+          <button class="btn" data-action="open-worldmap">World map</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== WORLD MAP ===================== -->
+    <div id="screen-worldmap" class="overlay screen" hidden>
+      <div class="panel panel--wide">
+        <header class="panel__header">
+          <h2 id="worldmap-title">World map</h2>
+          <button class="btn btn--ghost" data-action="back">Back</button>
+        </header>
+        <div class="worldmap">
+          <canvas id="worldmap-canvas" width="760" height="560" aria-label="World map"></canvas>
+          <div class="worldmap__side">
+            <h3 id="worldmap-map-name">—</h3>
+            <p class="muted small" id="worldmap-summary"></p>
+            <ul id="worldmap-legend" class="legend"></ul>
+            <h3>Locations</h3>
+            <ul id="worldmap-locations" class="legend legend--named"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== CHALLENGES ===================== -->
+    <div id="screen-challenges" class="overlay screen" hidden>
+      <div class="panel panel--wide">
+        <header class="panel__header">
+          <h2>Challenges</h2>
+          <button class="btn btn--ghost" data-action="back">Back</button>
+        </header>
+        <p class="muted">
+          Complete challenges to unlock vehicles. Free roam is always available from the main menu.
+        </p>
+        <ul id="challenges-list" class="cards" role="listbox" aria-label="Challenges"></ul>
+      </div>
+    </div>
+
+    <!-- ===================== SETTINGS ===================== -->
+    <div id="screen-settings" class="overlay screen" hidden>
+      <div class="panel panel--wide">
+        <header class="panel__header">
+          <h2>Settings</h2>
+          <button class="btn btn--ghost" data-action="back">Back</button>
+        </header>
+        <div class="settings">
+          <section class="settings__group">
+            <h3>Graphics</h3>
+            <label class="field">
+              <span>Quality preset</span>
+              <select data-setting="preset">
+                <option value="potato">Potato (fastest)</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Render scale (<output data-output="renderScale"></output>x)</span>
+              <input type="range" data-setting="renderScale" min="0.4" max="1" step="0.05" />
+            </label>
+            <label class="field">
+              <span>View distance (<output data-output="viewDistance"></output> m)</span>
+              <input type="range" data-setting="viewDistance" min="200" max="3000" step="50" />
+            </label>
+            <label class="field">
+              <span>Shadows</span>
+              <select data-setting="shadows">
+                <option value="off">Off</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Anti-aliasing</span>
+              <select data-setting="antialias">
+                <option value="off">Off</option>
+                <option value="fxaa">FXAA (cheap)</option>
+                <option value="msaa">MSAA (best)</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Textures</span>
+              <select data-setting="textureQuality">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Vegetation density (<output data-output="vegetationDensity"></output>%)</span>
+              <input type="range" data-setting="vegetationDensity" min="0" max="100" step="5" />
+            </label>
+            <label class="field">
+              <span>Traffic density (<output data-output="trafficDensity"></output>%)</span>
+              <input type="range" data-setting="trafficDensity" min="0" max="100" step="5" />
+            </label>
+            <label class="field">
+              <span>FPS limit</span>
+              <select data-setting="fpsLimit">
+                <option value="0">Unlimited</option>
+                <option value="30">30</option>
+                <option value="60">60</option>
+                <option value="120">120</option>
+              </select>
+            </label>
+            <label class="field field--checkbox">
+              <input type="checkbox" data-setting="showFps" />
+              <span>Show performance overlay (F3)</span>
+            </label>
+            <label class="field field--checkbox">
+              <input type="checkbox" data-setting="skidMarks" />
+              <span>Skid marks</span>
+            </label>
+          </section>
+
+          <section class="settings__group">
+            <h3>Driving</h3>
+            <label class="field">
+              <span>Transmission</span>
+              <select data-setting="transmission">
+                <option value="auto">Automatic</option>
+                <option value="manual">Manual (Shift / Ctrl)</option>
+              </select>
+            </label>
+          </section>
+
+          <section class="settings__group">
+            <h3>World</h3>
+            <label class="field">
+              <span>Time of day (<output data-output="timeOfDay"></output>)</span>
+              <input type="range" data-setting="timeOfDay" min="0" max="23.9" step="0.1" />
+            </label>
+            <label class="field field--checkbox">
+              <input type="checkbox" data-setting="dayNightCycle" />
+              <span>Advance time while driving</span>
+            </label>
+            <label class="field">
+              <span>Day length (<output data-output="dayLengthMinutes"></output> min)</span>
+              <input type="range" data-setting="dayLengthMinutes" min="2" max="240" step="2" />
+            </label>
+            <label class="field">
+              <span>Weather</span>
+              <select data-setting="weather">
+                <option value="clear">Clear</option>
+                <option value="overcast">Overcast</option>
+                <option value="rain">Rain</option>
+                <option value="storm">Thunderstorm</option>
+              </select>
+            </label>
+            <p class="muted small">
+              Rain makes the asphalt slippery — grip recovers gradually after it stops.
+            </p>
+          </section>
+
+          <section class="settings__group">
+            <h3>Audio</h3>
+            <label class="field">
+              <span>Master (<output data-output="masterVolume"></output>%)</span>
+              <input type="range" data-setting="masterVolume" min="0" max="100" step="1" />
+            </label>
+            <label class="field">
+              <span>Engine (<output data-output="engineVolume"></output>%)</span>
+              <input type="range" data-setting="engineVolume" min="0" max="100" step="1" />
+            </label>
+            <label class="field">
+              <span>Effects (<output data-output="effectsVolume"></output>%)</span>
+              <input type="range" data-setting="effectsVolume" min="0" max="100" step="1" />
+            </label>
+            <label class="field">
+              <span>Ambience (<output data-output="ambienceVolume"></output>%)</span>
+              <input type="range" data-setting="ambienceVolume" min="0" max="100" step="1" />
+            </label>
+          </section>
+
+          <section class="settings__group">
+            <h3>Controls — keyboard</h3>
+            <div id="bindings" class="bindings"></div>
+            <p class="muted small">
+              Click a binding, then press a key. Game controllers are detected automatically.
+            </p>
+            <label class="field">
+              <span
+                >Gamepad steering deadzone (<output data-output="gamepadDeadzone"></output>)</span
+              >
+              <input type="range" data-setting="gamepadDeadzone" min="0" max="0.5" step="0.01" />
+            </label>
+            <label class="field">
+              <span>Camera sensitivity (<output data-output="cameraSensitivity"></output>)</span>
+              <input type="range" data-setting="cameraSensitivity" min="0.2" max="3" step="0.1" />
+            </label>
+          </section>
+
+          <section class="settings__group settings__group--danger">
+            <h3>Progress</h3>
+            <p class="muted small" id="progress-summary"></p>
+            <button class="btn btn--danger" data-action="reset-progress">Reset progress…</button>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== CREDITS ===================== -->
+    <div id="screen-credits" class="overlay screen" hidden>
+      <div class="panel">
+        <header class="panel__header">
+          <h2>Credits</h2>
+          <button class="btn btn--ghost" data-action="back">Back</button>
+        </header>
+        <div class="credits">
+          <p>
+            <strong>AERODRIVE</strong> is an original, open-world driving simulator built with
+            <a href="https://threejs.org/" target="_blank" rel="noreferrer noopener">Three.js</a>
+            (rendering) and
+            <a href="https://rapier.rs/" target="_blank" rel="noreferrer noopener">Rapier</a>
+            (physics).
+          </p>
+          <p>
+            All 3D geometry, textures, and sounds in this build are generated procedurally by the
+            game itself. No third-party models, maps, or audio are bundled.
+          </p>
+          <p class="muted">
+            Inspired by the freedom and simulation spirit of modern driving sandboxes. Contains no
+            assets, code, or branding from any commercial title.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== PAUSE ===================== -->
+    <div id="screen-pause" class="overlay screen" hidden>
+      <div class="panel panel--narrow">
+        <header class="panel__header">
+          <h2>Paused</h2>
+        </header>
+        <nav class="menu__nav">
+          <button class="btn btn--primary" data-action="resume" data-autofocus>Resume</button>
+          <button class="btn" data-action="restart-challenge">Restart challenge</button>
+          <button class="btn" data-action="open-settings">Settings</button>
+          <button class="btn" data-action="open-garage">Change vehicle</button>
+          <button class="btn" data-action="open-maps">Change map</button>
+          <button class="btn" data-action="open-worldmap">World map</button>
+          <button class="btn" data-action="recover">Recover vehicle</button>
+          <button class="btn" data-action="quit-to-menu">Quit to main menu</button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- ===================== CONFIRM DIALOG ===================== -->
+    <div id="screen-confirm" class="overlay screen" hidden>
+      <div class="panel panel--narrow">
+        <header class="panel__header">
+          <h2 id="confirm-title">Are you sure?</h2>
+        </header>
+        <p id="confirm-body" class="muted"></p>
+        <div class="dialog__actions">
+          <button class="btn" data-action="confirm-no">Cancel</button>
+          <button class="btn btn--danger" data-action="confirm-yes" data-autofocus>Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== IN-GAME HUD ===================== -->
+    <div id="hud" class="hud" hidden>
+      <div class="hud__speed" aria-live="off">
+        <canvas id="speedometer" width="220" height="220" aria-hidden="true"></canvas>
+        <div class="hud__speedText"><span id="hud-speed">0</span><small>km/h</small></div>
+      </div>
+
+      <div class="hud__stats">
+        <div class="hud__stat">
+          <span class="hud__label">Gear</span><span id="hud-gear">N</span>
+        </div>
+        <div class="hud__stat"><span class="hud__label">RPM</span><span id="hud-rpm">0</span></div>
+        <div class="hud__stat">
+          <span class="hud__label">Damage</span><span id="hud-damage">0%</span>
+        </div>
+        <div class="hud__stat">
+          <span class="hud__label">Time</span><span id="hud-clock">--:--</span>
+        </div>
+        <div class="hud__stat">
+          <span class="hud__label">Weather</span><span id="hud-weather">—</span>
+        </div>
+        <div class="hud__stat">
+          <span class="hud__label">Grip</span><span id="hud-grip">100%</span>
+        </div>
+      </div>
+
+      <div class="hud__map">
+        <canvas id="minimap" width="180" height="180" aria-label="Minimap"></canvas>
+        <div id="hud-location" class="hud__location">—</div>
+      </div>
+      <button
+        id="hud-drift-toggle"
+        class="hud__drift-toggle"
+        type="button"
+        data-action="toggle-drift"
+        aria-pressed="false"
+      >
+        Drift mode: Off
+      </button>
+
+      <div id="hud-objective" class="hud__objective" hidden>
+        <div id="hud-objective-title">—</div>
+        <div id="hud-objective-detail" class="muted"></div>
+      </div>
+
+      <div id="hud-toast" class="hud__toast" role="status" aria-live="polite"></div>
+
+      <div id="perf-overlay" class="perf" hidden>
+        <div id="perf-text"></div>
+      </div>
+
+      <div id="offroad-hint" class="hud__hint" hidden>Off-road — grip reduced</div>
+
+      <!-- On-screen driving controls. Hidden unless the device reports touch. -->
+      <div id="touch-controls" class="touch" hidden>
+        <button
+          class="touch__button touch__button--pause"
+          type="button"
+          data-touch-action="pause"
+          aria-label="Pause"
+        >
+          II
+        </button>
+        <div class="touch__cluster touch__cluster--steer" role="group" aria-label="Steering">
+          <button
+            class="touch__button"
+            type="button"
+            data-touch-action="steerLeft"
+            aria-label="Steer left"
+            aria-pressed="false"
+          >
+            ◀
+          </button>
+          <button
+            class="touch__button"
+            type="button"
+            data-touch-action="steerRight"
+            aria-label="Steer right"
+            aria-pressed="false"
+          >
+            ▶
+          </button>
+        </div>
+        <button
+          class="touch__button touch__button--handbrake"
+          type="button"
+          data-touch-action="handbrake"
+          aria-label="Handbrake"
+          aria-pressed="false"
+        >
+          HB
+        </button>
+        <div
+          class="touch__cluster touch__cluster--drive"
+          role="group"
+          aria-label="Throttle and brake"
+        >
+          <button
+            class="touch__button touch__button--brake"
+            type="button"
+            data-touch-action="brake"
+            aria-label="Brake and reverse"
+            aria-pressed="false"
+          >
+            ▼
+          </button>
+          <button
+            class="touch__button touch__button--throttle"
+            type="button"
+            data-touch-action="throttle"
+            aria-label="Accelerate"
+            aria-pressed="false"
+          >
+            ▲
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== CONTROL GUIDE ===================== -->
+    <div id="controls-guide" class="guide" hidden>
+      <h3>Controls</h3>
+      <ul>
+        <li><kbd>W</kbd>/<kbd>↑</kbd> accelerate</li>
+        <li><kbd>S</kbd>/<kbd>↓</kbd> brake / reverse</li>
+        <li><kbd>A</kbd>/<kbd>←</kbd> steer left</li>
+        <li><kbd>D</kbd>/<kbd>→</kbd> steer right</li>
+        <li><kbd>Space</kbd> handbrake</li>
+        <li><kbd>G</kbd> toggle drift mode</li>
+        <li><kbd>Shift</kbd> upshift (manual)</li>
+        <li><kbd>Ctrl</kbd> downshift (manual)</li>
+        <li><kbd>F</kbd> horn</li>
+        <li><kbd>F3</kbd> performance overlay</li>
+        <li><kbd>C</kbd> change camera</li>
+        <li><kbd>R</kbd> recover vehicle</li>
+        <li><kbd>H</kbd> headlights</li>
+        <li><kbd>M</kbd> toggle this guide</li>
+        <li><kbd>Esc</kbd> pause</li>
+      </ul>
+    </div>
+
+    <noscript>
+      <div class="overlay overlay--opaque">
+        <p>AERODRIVE requires JavaScript and WebGL to run.</p>
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

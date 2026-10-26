@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AERODRIVE">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff5a1f" />
+      <stop offset="1" stop-color="#0ea5e9" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0b0f14" />
+  <path d="M10 40c2.5-9 8-14 22-14s19.5 5 22 14" fill="none" stroke="url(#g)" stroke-width="4.5" stroke-linecap="round" />
+  <path d="M20 30l12-12 12 12" fill="none" stroke="url(#g)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="32" cy="46" r="4.5" fill="url(#g)" />
+</svg>

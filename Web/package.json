@@ -1,0 +1,34 @@
+{
+  "name": "aerodrive-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "AERODRIVE — an open-world 3D driving simulator for the browser (Three.js + Rapier).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,json,css,html,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,css,html,md}\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "npm run build && playwright test",
+    "test:e2e:webkit": "npm run build && playwright test --project=webkit"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.21.0",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.64.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "globals": "^15.0.0",
+    "prettier": "^3.0.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.0.0"
+  }
+}
