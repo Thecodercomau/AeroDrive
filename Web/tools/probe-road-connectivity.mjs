@@ -121,7 +121,11 @@ roads.forEach((road, i) => {
 const ranked = [...components.entries()].sort((a, b) => b[1].length - a[1].length);
 
 console.info(`\n${map.name} (${mapId}) — ${roads.length} roads, ${joins.length} junctions`);
-console.info(`network: ${ranked.length} disconnected piece(s)${margin ? `, ${margin} m of slack` : ''}`);
+console.info(
+  ranked.length === 1
+    ? `network: fully connected${margin ? `, ${margin} m of slack` : ''}`
+    : `network: ${ranked.length} disconnected pieces${margin ? `, ${margin} m of slack` : ''}`,
+);
 ranked.forEach(([, names], index) => {
   const label = index === 0 ? 'largest' : `piece ${index + 1}`;
   if (index === 0) {

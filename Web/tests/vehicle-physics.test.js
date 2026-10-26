@@ -2,7 +2,7 @@ import { describe, expect, it, beforeAll, afterAll } from 'vitest';
 import { PhysicsWorld } from '../src/physics/PhysicsWorld.js';
 import { Vehicle } from '../src/vehicles/Vehicle.js';
 import { createVehicleModel } from '../src/vehicles/VehicleFactory.js';
-import { getVehicleDefinition } from '../src/vehicles/definitions.js';
+import { VEHICLES, getVehicleDefinition } from '../src/vehicles/definitions.js';
 import { emptyControlState } from '../src/input/inputMapping.js';
 
 /**
@@ -81,6 +81,25 @@ describe('vehicle physics (real Rapier simulation)', () => {
     body.geometry.computeBoundingBox();
     const bounds = body.geometry.boundingBox;
     expect((bounds.min.x + bounds.max.x) / 2).toBeCloseTo(0, 6);
+  });
+
+  it('keeps the cockpit camera inside the roofline and only builds player interiors', () => {
+    for (const definition of VEHICLES) {
+      const exterior = createVehicleModel(definition);
+      expect(exterior.userData.interior).toBeUndefined();
+
+      const player = createVehicleModel(definition, null, { interior: true });
+      const body = player.userData.bodyMesh;
+      body.geometry.computeBoundingBox();
+      const bounds = body.geometry.boundingBox;
+      const cockpit = definition.cameraPositions.cockpit;
+
+      expect(cockpit.y, definition.id).toBeLessThan(bounds.max.y);
+      expect(cockpit.y, definition.id).toBeGreaterThan(bounds.min.y + 0.2);
+      expect(cockpit.z, definition.id).toBeGreaterThan(bounds.min.z);
+      expect(cockpit.z, definition.id).toBeLessThan(bounds.max.z);
+      expect(player.userData.interior.children.length, definition.id).toBeGreaterThanOrEqual(8);
+    }
   });
 
   it('keeps front wheel steering separate from wheel spin', async () => {
@@ -165,6 +184,41 @@ describe('vehicle physics (real Rapier simulation)', () => {
     world.dispose();
   });
 
+  it('matches every vehicle spec sheet within a realistic tolerance', async () => {
+    for (const definition of VEHICLES) {
+      const world = new PhysicsWorld();
+      await world.init();
+      makeGround(world);
+      const vehicle = new Vehicle({
+        physics: world,
+        definition,
+        spawn: { x: 0, y: 1.2, z: 0 },
+      });
+
+      simulate(world, vehicle, 60, {});
+      let zeroTo100 = null;
+      let topSpeed = 0;
+      for (let i = 0; i < 7200; i++) {
+        simulate(world, vehicle, 1, { throttle: 1 });
+        const speed = vehicle.speedKmh();
+        if (zeroTo100 === null && speed >= 100) zeroTo100 = (i + 1) * DT;
+        topSpeed = Math.max(topSpeed, speed);
+      }
+
+      const label =
+        `${definition.id}: top ${topSpeed.toFixed(1)} / ` +
+        `${definition.stats.topSpeedKmh}, 0-100 ${zeroTo100?.toFixed(2)} / ` +
+        `${definition.stats.zeroTo100}`;
+      expect(topSpeed, label).toBeGreaterThan(definition.stats.topSpeedKmh * 0.94);
+      expect(topSpeed, label).toBeLessThan(definition.stats.topSpeedKmh * 1.06);
+      expect(zeroTo100, label).not.toBeNull();
+      expect(Math.abs(zeroTo100 - definition.stats.zeroTo100), label).toBeLessThan(0.35);
+
+      vehicle.dispose();
+      world.dispose();
+    }
+  }, 60000);
+
   it('reverses when the brake is held from a standstill', async () => {
     const world = new PhysicsWorld();
     await world.init();
@@ -201,8 +255,15 @@ describe('vehicle physics (real Rapier simulation)', () => {
     const fastSpeed = vehicle.speedKmh();
     expect(fastSpeed).toBeGreaterThan(60);
 
-    simulate(world, vehicle, 600, { brake: 1 });
-    expect(vehicle.speedKmh()).toBeLessThan(10);
+    // Stop measuring once the car is nearly stationary. Holding brake past
+    // that point selects reverse (an intended feature), so a fixed-duration
+    // simulation ends up testing reverse acceleration instead of braking.
+    let stopped = false;
+    for (let i = 0; i < 600 && !stopped; i++) {
+      simulate(world, vehicle, 1, { brake: 1 });
+      stopped = vehicle.speedKmh() < 10;
+    }
+    expect(stopped).toBe(true);
 
     vehicle.dispose();
     world.dispose();

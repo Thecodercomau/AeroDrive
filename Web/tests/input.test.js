@@ -7,6 +7,7 @@ import {
   readKeyboardInput,
   readTouchInput,
 } from '../src/input/inputMapping.js';
+import { InputManager } from '../src/input/InputManager.js';
 import { DEFAULT_BINDINGS } from '../src/settings/settings.js';
 
 /** Build a fake Gamepad with the standard mapping. */
@@ -148,6 +149,20 @@ describe('control state merging', () => {
     const merged = mergeControlStates(a, b);
     expect(merged.handbrake).toBe(true);
     expect(merged.recover).toBe(true);
+  });
+});
+
+describe('one-shot input latches', () => {
+  it('fires a held key once, not once per sample', () => {
+    const manager = new InputManager({
+      target: null,
+      getBindings: () => DEFAULT_BINDINGS,
+    });
+    manager.pressed.add('KeyC');
+    manager._latched.toggleCamera = true;
+
+    expect(manager.sample().toggleCamera).toBe(true);
+    expect(manager.sample().toggleCamera).toBe(false);
   });
 });
 

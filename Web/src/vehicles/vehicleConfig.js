@@ -38,7 +38,10 @@ export const VEHICLE_DEFAULTS = {
   // Collider used for the body: a single box keeps contacts cheap and stable.
   colliderFriction: 0.6,
   colliderRestitution: 0.08,
-  linearDamping: 0.06,
+  // Velocity damping is not a stability aid: Rapier applies it to the whole
+  // body every step. 0.06 removed ~1790 N at highway speed and capped cars
+  // far below their rated top speed. Keep it tiny; aero drag does the work.
+  linearDamping: 0.005,
   angularDamping: 0.35,
 
   // --- Wheels -------------------------------------------------------------
@@ -89,7 +92,7 @@ export const VEHICLE_DEFAULTS = {
 
   // --- Brakes / steering --------------------------------------------------
   brakes: {
-    maxBrake: 22, // impulse magnitude applied per wheel
+    maxBrake: 7200, // brake force in newtons per wheel before brake bias
     handbrakeFactor: 3.2, // multiplier on the rear wheels
     brakeBias: 0.62, // fraction of braking force to the front axle
   },
@@ -142,8 +145,8 @@ export const VEHICLE_DEFAULTS = {
   },
   cameraPositions: {
     chase: { distance: 7.2, height: 3.1, lookAhead: 4 },
-    cockpit: { x: 0, y: 0.86, z: 0.35 },
-    hood: { x: 0, y: 1.02, z: 2.1 },
+    cockpit: { x: -0.3, y: 0.4, z: 0.1 },
+    hood: { x: 0, y: 0.24, z: 2.1 },
   },
   audio: {
     // Engine note shaping: `noteOffset` is a semitone offset applied to the

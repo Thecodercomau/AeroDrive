@@ -195,7 +195,78 @@ const SHARED = {
     emissiveIntensity: 0.35,
     roughness: 0.3,
   }),
+  interior: new THREE.MeshStandardMaterial({ color: 0x25282d, roughness: 0.86 }),
+  interiorTrim: new THREE.MeshStandardMaterial({
+    color: 0x111317,
+    roughness: 0.5,
+    metalness: 0.3,
+  }),
+  mirror: new THREE.MeshStandardMaterial({ color: 0x8d98a3, roughness: 0.15, metalness: 0.9 }),
 };
+
+/**
+ * Add a simple cabin so the cockpit camera looks out of a car rather than
+ * floating inside an empty painted shell. Only the player's vehicle asks for
+ * this: traffic cars keep the cheap exterior-only model.
+ */
+function addInterior(group, config) {
+  const half = config.chassisHalfExtents;
+  const eye = config.cameraPositions.cockpit;
+  const interior = new THREE.Group();
+  interior.name = 'interior';
+
+  const dashboard = new THREE.Mesh(
+    new THREE.BoxGeometry(half.x * 1.5, 0.16, 0.32),
+    SHARED.interior,
+  );
+  dashboard.position.set(0, eye.y - 0.17, eye.z + 0.56);
+  interior.add(dashboard);
+
+  const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.025, 8, 20), SHARED.interiorTrim);
+  wheel.position.set(eye.x, eye.y - 0.18, eye.z + 0.36);
+  wheel.rotation.x = -0.22;
+  interior.add(wheel);
+
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.06, 10), SHARED.trim);
+  hub.position.copy(wheel.position);
+  hub.rotation.x = Math.PI / 2;
+  interior.add(hub);
+
+  const column = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.035, 0.035, 0.3, 8),
+    SHARED.interiorTrim,
+  );
+  column.position.set(eye.x, eye.y - 0.22, eye.z + 0.5);
+  column.rotation.x = Math.PI / 2;
+  interior.add(column);
+
+  const console = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 0.5), SHARED.interior);
+  console.position.set(0, eye.y - 0.34, eye.z + 0.12);
+  interior.add(console);
+
+  for (const side of [-1, 1]) {
+    const seatX = side * half.x * 0.34;
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.12, 0.42), SHARED.interior);
+    base.position.set(seatX, eye.y - 0.31, eye.z - 0.22);
+    interior.add(base);
+
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.58, 0.11), SHARED.interior);
+    back.position.set(seatX, eye.y - 0.02, eye.z - 0.48);
+    back.rotation.x = -0.12;
+    interior.add(back);
+
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.26, 0.82), SHARED.interior);
+    door.position.set(side * half.x * 0.82, eye.y - 0.18, eye.z - 0.02);
+    interior.add(door);
+  }
+
+  const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.07, 0.04), SHARED.mirror);
+  mirror.position.set(0, half.y * 0.68, eye.z + 0.7);
+  interior.add(mirror);
+
+  group.add(interior);
+  group.userData.interior = interior;
+}
 
 function paintMaterial(paintId) {
   const paint = resolvePaint(paintId);
@@ -211,9 +282,10 @@ function paintMaterial(paintId) {
  *
  * @param {object} config Normalised vehicle definition.
  * @param {string} [paintId]
+ * @param {{interior?: boolean}} [options] Build the player-only cabin geometry.
  * @returns {THREE.Group} Group whose `userData` exposes wheels and light hooks.
  */
-export function createVehicleModel(config, paintId = null) {
+export function createVehicleModel(config, paintId = null, { interior = false } = {}) {
   const group = new THREE.Group();
   group.name = `vehicle:${config.id}`;
   group.userData.definitionId = config.id;
@@ -316,6 +388,8 @@ export function createVehicleModel(config, paintId = null) {
     splitter.position.set(0, -half.y * 0.92, half.z * 0.78);
     group.add(splitter);
   }
+
+  if (interior) addInterior(group, config);
 
   // --- Wheels ------------------------------------------------------------
   const halfTrack = config.derived.halfTrack;

@@ -55,16 +55,16 @@ export const VEHICLE_DEFINITIONS = [
         [6200, 88],
       ],
     },
-    brakes: { maxBrake: 20, handbrakeFactor: 3.0, brakeBias: 0.68 },
+    brakes: { maxBrake: 6000, handbrakeFactor: 3.0, brakeBias: 0.68 },
     steering: {
       maxAngleDeg: 36,
       speedFalloff: 0.5,
       falloffSpeedKmh: 150,
       maxSteerRateDegPerSec: 260,
     },
-    aero: { dragCoefficient: 0.31, downforce: 0.35, rollingResistance: 0.016 },
+    aero: { dragCoefficient: 0.392, downforce: 0.35, rollingResistance: 0.016 },
     assists: { tractionControl: 0.45, abs: true, stability: 0.3 },
-    stats: { powerHp: 108, topSpeedKmh: 190, zeroTo100: 10.4 },
+    stats: { powerHp: 108, topSpeedKmh: 190, zeroTo100: 11.1 },
     paint: {
       default: 'racingRed',
       palette: ['factory', 'racingRed', 'sunburstYellow', 'pearlWhite', 'forestGreen'],
@@ -72,7 +72,8 @@ export const VEHICLE_DEFINITIONS = [
     audio: { cylinders: 4, noteOffset: 4, idleGain: 0.24, maxGain: 0.52 },
     cameraPositions: {
       chase: { distance: 6.4, height: 2.7, lookAhead: 3.6 },
-      cockpit: { x: 0, y: 0.92, z: 0.45 },
+      cockpit: { x: -0.3, y: 0.38, z: 0.14 },
+      hood: { x: 0, y: 0.24, z: 1.75 },
     },
   },
 
@@ -119,16 +120,16 @@ export const VEHICLE_DEFINITIONS = [
         [6600, 200],
       ],
     },
-    brakes: { maxBrake: 26, handbrakeFactor: 2.6, brakeBias: 0.64 },
+    brakes: { maxBrake: 8000, handbrakeFactor: 2.6, brakeBias: 0.64 },
     steering: {
       maxAngleDeg: 33,
       speedFalloff: 0.52,
       falloffSpeedKmh: 170,
       maxSteerRateDegPerSec: 240,
     },
-    aero: { dragCoefficient: 0.3, downforce: 0.45, rollingResistance: 0.013 },
+    aero: { dragCoefficient: 0.577, downforce: 0.45, rollingResistance: 0.013 },
     assists: { tractionControl: 0.4, abs: true, stability: 0.28 },
-    stats: { powerHp: 245, topSpeedKmh: 240, zeroTo100: 6.4 },
+    stats: { powerHp: 245, topSpeedKmh: 240, zeroTo100: 6.3 },
     paint: {
       default: 'graphite',
       palette: ['factory', 'graphite', 'midnightBlue', 'pearlWhite', 'forestGreen'],
@@ -136,7 +137,8 @@ export const VEHICLE_DEFINITIONS = [
     audio: { cylinders: 6, noteOffset: 0, idleGain: 0.26, maxGain: 0.56 },
     cameraPositions: {
       chase: { distance: 7.0, height: 3.0, lookAhead: 4.0 },
-      cockpit: { x: 0, y: 0.95, z: 0.3 },
+      cockpit: { x: -0.3, y: 0.36, z: 0.05 },
+      hood: { x: 0, y: 0.22, z: 2.15 },
     },
   },
 
@@ -183,16 +185,16 @@ export const VEHICLE_DEFINITIONS = [
         [7600, 260],
       ],
     },
-    brakes: { maxBrake: 30, handbrakeFactor: 2.2, brakeBias: 0.61 },
+    brakes: { maxBrake: 7500, handbrakeFactor: 2.2, brakeBias: 0.61 },
     steering: {
       maxAngleDeg: 32,
       speedFalloff: 0.58,
       falloffSpeedKmh: 200,
       maxSteerRateDegPerSec: 260,
     },
-    aero: { dragCoefficient: 0.33, downforce: 0.9, rollingResistance: 0.012 },
+    aero: { dragCoefficient: 0.706, downforce: 0.9, rollingResistance: 0.012 },
     assists: { tractionControl: 0.3, abs: true, stability: 0.2 },
-    stats: { powerHp: 380, topSpeedKmh: 275, zeroTo100: 4.6 },
+    stats: { powerHp: 380, topSpeedKmh: 275, zeroTo100: 4.3 },
     paint: {
       default: 'sunburstYellow',
       palette: ['sunburstYellow', 'racingRed', 'midnightBlue', 'pearlWhite', 'graphite'],
@@ -200,8 +202,8 @@ export const VEHICLE_DEFINITIONS = [
     audio: { cylinders: 6, noteOffset: -2, idleGain: 0.3, maxGain: 0.66 },
     cameraPositions: {
       chase: { distance: 6.8, height: 2.8, lookAhead: 4.2 },
-      cockpit: { x: 0, y: 0.82, z: 0.15 },
-      hood: { x: 0, y: 0.92, z: 1.9 },
+      cockpit: { x: -0.28, y: 0.25, z: -0.04 },
+      hood: { x: 0, y: 0.12, z: 2.0 },
     },
   },
 
@@ -248,16 +250,16 @@ export const VEHICLE_DEFINITIONS = [
         [8800, 460],
       ],
     },
-    brakes: { maxBrake: 38, handbrakeFactor: 1.9, brakeBias: 0.6 },
+    brakes: { maxBrake: 8500, handbrakeFactor: 1.9, brakeBias: 0.6 },
     steering: {
       maxAngleDeg: 28,
       speedFalloff: 0.66,
       falloffSpeedKmh: 220,
       maxSteerRateDegPerSec: 280,
     },
-    aero: { dragCoefficient: 0.34, downforce: 1.9, rollingResistance: 0.011 },
+    aero: { dragCoefficient: 0.858, downforce: 1.9, rollingResistance: 0.011 },
     assists: { tractionControl: 0.45, abs: true, stability: 0.35 },
-    stats: { powerHp: 740, topSpeedKmh: 330, zeroTo100: 2.9 },
+    stats: { powerHp: 740, topSpeedKmh: 330, zeroTo100: 4.1 },
     paint: {
       default: 'racingRed',
       palette: ['racingRed', 'burntOrange', 'pearlWhite', 'graphite', 'midnightBlue'],
@@ -265,8 +267,8 @@ export const VEHICLE_DEFINITIONS = [
     audio: { cylinders: 8, noteOffset: -5, idleGain: 0.32, maxGain: 0.72 },
     cameraPositions: {
       chase: { distance: 6.6, height: 2.6, lookAhead: 4.6 },
-      cockpit: { x: 0, y: 0.72, z: 0.1 },
-      hood: { x: 0, y: 0.8, z: 2.0 },
+      cockpit: { x: -0.3, y: 0.16, z: -0.06 },
+      hood: { x: 0, y: 0.08, z: 2.05 },
     },
   },
 
@@ -312,16 +314,16 @@ export const VEHICLE_DEFINITIONS = [
         [5200, 380],
       ],
     },
-    brakes: { maxBrake: 28, handbrakeFactor: 2.4, brakeBias: 0.62 },
+    brakes: { maxBrake: 11000, handbrakeFactor: 2.4, brakeBias: 0.62 },
     steering: {
       maxAngleDeg: 34,
       speedFalloff: 0.44,
       falloffSpeedKmh: 140,
       maxSteerRateDegPerSec: 200,
     },
-    aero: { dragCoefficient: 0.43, downforce: 0.25, rollingResistance: 0.019 },
+    aero: { dragCoefficient: 1.156, downforce: 0.25, rollingResistance: 0.019 },
     assists: { tractionControl: 0.55, abs: true, stability: 0.4 },
-    stats: { powerHp: 300, topSpeedKmh: 210, zeroTo100: 7.4 },
+    stats: { powerHp: 300, topSpeedKmh: 210, zeroTo100: 8.1 },
     paint: {
       default: 'forestGreen',
       palette: ['forestGreen', 'olive', 'graphite', 'pearlWhite', 'sand'],
@@ -329,7 +331,8 @@ export const VEHICLE_DEFINITIONS = [
     audio: { cylinders: 6, noteOffset: 6, idleGain: 0.3, maxGain: 0.58 },
     cameraPositions: {
       chase: { distance: 7.6, height: 3.6, lookAhead: 4.0 },
-      cockpit: { x: 0, y: 1.15, z: 0.4 },
+      cockpit: { x: -0.32, y: 0.52, z: 0.16 },
+      hood: { x: 0, y: 0.34, z: 2.3 },
     },
   },
 
@@ -375,16 +378,16 @@ export const VEHICLE_DEFINITIONS = [
         [4800, 470],
       ],
     },
-    brakes: { maxBrake: 30, handbrakeFactor: 2.8, brakeBias: 0.6 },
+    brakes: { maxBrake: 12000, handbrakeFactor: 2.8, brakeBias: 0.6 },
     steering: {
       maxAngleDeg: 33,
       speedFalloff: 0.4,
       falloffSpeedKmh: 130,
       maxSteerRateDegPerSec: 180,
     },
-    aero: { dragCoefficient: 0.48, downforce: 0.2, rollingResistance: 0.021 },
+    aero: { dragCoefficient: 1.762, downforce: 0.2, rollingResistance: 0.021 },
     assists: { tractionControl: 0.5, abs: true, stability: 0.38 },
-    stats: { powerHp: 360, topSpeedKmh: 195, zeroTo100: 8.6 },
+    stats: { powerHp: 360, topSpeedKmh: 195, zeroTo100: 8.8 },
     paint: {
       default: 'burntOrange',
       palette: ['burntOrange', 'graphite', 'pearlWhite', 'olive', 'sand'],
@@ -392,7 +395,8 @@ export const VEHICLE_DEFINITIONS = [
     audio: { cylinders: 8, noteOffset: 8, idleGain: 0.3, maxGain: 0.6 },
     cameraPositions: {
       chase: { distance: 8.0, height: 3.7, lookAhead: 4.2 },
-      cockpit: { x: 0, y: 1.2, z: 0.6 },
+      cockpit: { x: -0.32, y: 0.4, z: 0.04 },
+      hood: { x: 0, y: 0.2, z: 2.58 },
     },
   },
 
@@ -438,16 +442,16 @@ export const VEHICLE_DEFINITIONS = [
         [5000, 420],
       ],
     },
-    brakes: { maxBrake: 26, handbrakeFactor: 2.0, brakeBias: 0.58 },
+    brakes: { maxBrake: 10500, handbrakeFactor: 2.0, brakeBias: 0.58 },
     steering: {
       maxAngleDeg: 40,
       speedFalloff: 0.42,
       falloffSpeedKmh: 120,
       maxSteerRateDegPerSec: 190,
     },
-    aero: { dragCoefficient: 0.5, downforce: 0.15, rollingResistance: 0.024 },
+    aero: { dragCoefficient: 2.23, downforce: 0.15, rollingResistance: 0.024 },
     assists: { tractionControl: 0.2, abs: true, stability: 0.3 },
-    stats: { powerHp: 320, topSpeedKmh: 175, zeroTo100: 9.2 },
+    stats: { powerHp: 320, topSpeedKmh: 175, zeroTo100: 7.6 },
     paint: {
       default: 'olive',
       palette: ['olive', 'forestGreen', 'sand', 'graphite', 'burntOrange'],
@@ -455,7 +459,8 @@ export const VEHICLE_DEFINITIONS = [
     audio: { cylinders: 6, noteOffset: 10, idleGain: 0.32, maxGain: 0.62 },
     cameraPositions: {
       chase: { distance: 7.4, height: 3.4, lookAhead: 4.0 },
-      cockpit: { x: 0, y: 1.05, z: 0.3 },
+      cockpit: { x: -0.3, y: 0.5, z: 0.14 },
+      hood: { x: 0, y: 0.36, z: 2.02 },
     },
   },
 ];

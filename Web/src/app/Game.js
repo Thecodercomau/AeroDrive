@@ -274,7 +274,7 @@ export class Game {
   }
 
   _createVehicle(definition, spawnPose, paintId) {
-    const model = createVehicleModel(definition, paintId);
+    const model = createVehicleModel(definition, paintId, { interior: true });
     this.renderer.add(model);
 
     const vehicle = new Vehicle({
@@ -897,6 +897,9 @@ export class Game {
       this.vehicle.headlightsOn = !this.vehicle.headlightsOn;
       setHeadlightGlow(this.vehicle.object3D, this.vehicle.headlightsOn);
       this.hud.toast(`Headlights ${this.vehicle.headlightsOn ? 'on' : 'off'}`, 1.2);
+    }
+    if (input.horn) {
+      this.audio.horn();
     }
   }
 

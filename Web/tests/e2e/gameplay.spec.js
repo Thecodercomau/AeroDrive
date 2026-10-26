@@ -364,6 +364,44 @@ test.describe('AERODRIVE gameplay', () => {
     expect(unique.has('chase')).toBe(true);
     expect(modes[modes.length - 1]).toBe(first);
 
+    // The cockpit eye must sit under the roofline rather than floating over the
+    // car, and the player's model must carry the cabin that the camera looks
+    // through. Traffic deliberately does not build this extra geometry.
+    const cabin = await page.evaluate(() => {
+      const g = window.aerodrive;
+      const body = g.vehicle.object3D.userData.bodyMesh;
+      body.geometry.computeBoundingBox();
+      return {
+        eyeY: g.vehicle.definition.cameraPositions.cockpit.y,
+        roofY: body.geometry.boundingBox.max.y,
+        interior: Boolean(g.vehicle.object3D.userData.interior),
+      };
+    });
+    expect(cabin.eyeY).toBeLessThan(cabin.roofY);
+    expect(cabin.interior).toBe(true);
+
+    expectCleanConsole(testInfo);
+  });
+
+  test('7b. honks once per press, not once per frame while held', async ({}, testInfo) => {
+    await page.evaluate(() => {
+      const g = window.aerodrive;
+      window.__hornCount = 0;
+      const original = g.audio.horn.bind(g.audio);
+      g.audio.horn = () => {
+        window.__hornCount += 1;
+        original();
+      };
+    });
+
+    await page.keyboard.down('KeyF');
+    await page.waitForTimeout(600);
+    await page.keyboard.up('KeyF');
+    expect(await game(page, 'window.__hornCount')).toBe(1);
+
+    await page.keyboard.press('KeyF');
+    await expect.poll(() => game(page, 'window.__hornCount')).toBe(2);
+
     expectCleanConsole(testInfo);
   });
 

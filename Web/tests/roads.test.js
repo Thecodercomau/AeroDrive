@@ -10,6 +10,71 @@ import {
   profileHeightAt,
 } from '../src/roads/structures.js';
 
+/** Distance from a point to a segment in the XZ plane. */
+function pointToSegment(px, pz, a, b) {
+  const dx = b.x - a.x;
+  const dz = b.z - a.z;
+  const lengthSq = dx * dx + dz * dz || 1;
+  const t = Math.max(0, Math.min(1, ((px - a.x) * dx + (pz - a.z) * dz) / lengthSq));
+  return Math.hypot(px - (a.x + dx * t), pz - (a.z + dz * t));
+}
+
+/**
+ * Count the connected pieces of a road network.
+ *
+ * Mirrors `tools/probe-road-connectivity.mjs`: two roads are joined when their
+ * centreline corridors overlap, which is the same rule that decides whether a
+ * car can drive from one onto the other without leaving the tarmac.
+ */
+function roadNetworkPieces(roads) {
+  const parent = roads.map((_, index) => index);
+  const find = (index) => {
+    let root = index;
+    while (parent[root] !== root) root = parent[root];
+    while (parent[index] !== root) {
+      const next = parent[index];
+      parent[index] = root;
+      index = next;
+    }
+    return root;
+  };
+  const union = (a, b) => {
+    const rootA = find(a);
+    const rootB = find(b);
+    if (rootA !== rootB) parent[rootB] = rootA;
+  };
+
+  for (let i = 0; i < roads.length; i++) {
+    for (let j = i + 1; j < roads.length; j++) {
+      const width = ((roads[i].width ?? 10) + (roads[j].width ?? 10)) / 2;
+      let gap = Infinity;
+      outer: for (let a = 0; a < roads[i].points.length - 1; a++) {
+        for (let b = 0; b < roads[j].points.length - 1; b++) {
+          gap = Math.min(
+            gap,
+            pointToSegment(
+              roads[i].points[a].x,
+              roads[i].points[a].z,
+              roads[j].points[b],
+              roads[j].points[b + 1],
+            ),
+            pointToSegment(
+              roads[j].points[b].x,
+              roads[j].points[b].z,
+              roads[i].points[a],
+              roads[i].points[a + 1],
+            ),
+          );
+          if (gap <= width) break outer;
+        }
+      }
+      if (gap <= width) union(i, j);
+    }
+  }
+
+  return new Set(roads.map((_, index) => find(index))).size;
+}
+
 /**
  * Road geometry tests.
  *
@@ -94,6 +159,18 @@ describe('road network on real maps', () => {
           0.35,
         );
       }
+    },
+  );
+
+  it.each(MAPS.map((map) => [map.id, map.name]))(
+    '%s (%s) has one connected road network',
+    (mapId) => {
+      const world = worlds.get(mapId);
+      const roads = world.roads.roads.map((road) => ({
+        width: road.width,
+        points: road.centreline,
+      }));
+      expect(roadNetworkPieces(roads), `${mapId} has a disconnected road`).toBe(1);
     },
   );
 

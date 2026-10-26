@@ -329,7 +329,7 @@ export class Vehicle {
 
     // Engine braking / coasting resistance when off the throttle.
     if (throttle < 0.05 && Math.abs(forwardSpeed) > 0.4 && !shift.shifting) {
-      const engineBrake = definition.brakes.maxBrake * 0.35;
+      const engineBrake = definition.brakes.maxBrake * 0.06;
       WHEEL_LAYOUT.forEach((layout, index) => {
         const share = drivetrain[layout.axle] / axleWheelCount[layout.axle];
         wheelForce[index] -= Math.sign(forwardSpeed) * engineBrake * share;
@@ -378,9 +378,10 @@ export class Vehicle {
       );
 
       if (definition.assists.abs && brakeInput > 0.15 && brake > 0) {
-        brake = Math.min(brake, this._maxLongitudinalForce(index) * dt * 0.9);
+        brake = Math.min(brake, this._maxLongitudinalForce(index) * 0.9);
       }
-      this.controller.setWheelBrake(index, brake);
+      // `maxBrake` is a force (N); Rapier's wheel brake input is an impulse.
+      this.controller.setWheelBrake(index, brake * dt);
     });
 
     // --- Secondary forces --------------------------------------------------

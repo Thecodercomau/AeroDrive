@@ -175,11 +175,13 @@ export class InputManager {
     merged.shiftUp = keyboard.shiftUp;
     merged.shiftDown = keyboard.shiftDown;
 
-    // One-shot latches are OR-ed in, then cleared for the next step.
-    merged.toggleCamera = merged.toggleCamera || this._latched.toggleCamera;
-    merged.recover = merged.recover || this._latched.recover;
-    merged.toggleHeadlights = merged.toggleHeadlights || this._latched.toggleHeadlights;
-    merged.horn = merged.horn || this._latched.horn;
+    // One-shot actions come only from the latches. The raw device states mark
+    // these actions true for as long as the key/button is held, but a camera
+    // toggle or recovery must fire once per press, not once per sample.
+    merged.toggleCamera = this._latched.toggleCamera;
+    merged.recover = this._latched.recover;
+    merged.toggleHeadlights = this._latched.toggleHeadlights;
+    merged.horn = this._latched.horn;
     this._latched = emptyControlState();
 
     this.mouseDelta.x = 0;

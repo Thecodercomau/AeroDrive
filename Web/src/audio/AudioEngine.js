@@ -404,6 +404,43 @@ export class AudioEngine {
     this._blip(up ? 220 : 160, 0.05, 'triangle', 0.12);
   }
 
+  /** Short dual-tone horn blast. */
+  horn() {
+    if (!this.ready) return;
+    const context = this.context;
+    const now = context.currentTime;
+    const envelope = context.createGain();
+    const filter = context.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 1900;
+    filter.Q.value = 0.7;
+
+    envelope.gain.setValueAtTime(0.0001, now);
+    envelope.gain.exponentialRampToValueAtTime(0.2, now + 0.015);
+    envelope.gain.setValueAtTime(0.2, now + 0.28);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, now + 0.42);
+    filter.connect(envelope);
+    envelope.connect(this.buses.effects);
+
+    let remaining = 2;
+    for (const frequency of [415, 523]) {
+      const oscillator = context.createOscillator();
+      oscillator.type = 'square';
+      oscillator.frequency.value = frequency;
+      oscillator.connect(filter);
+      oscillator.start(now);
+      oscillator.stop(now + 0.45);
+      oscillator.onended = () => {
+        oscillator.disconnect();
+        remaining -= 1;
+        if (remaining === 0) {
+          filter.disconnect();
+          envelope.disconnect();
+        }
+      };
+    }
+  }
+
   /** Collision thump, strength 0..1. */
   impact(strength = 0.5) {
     if (!this.ready) return;

@@ -260,6 +260,21 @@ const DESERT_DUNE_TRAIL = passRoad({
 // road has already levelled, so the ramp sits on flat ground.
 const DESERT_JUMP = rampOnRoad(DESERT_DUNE_TRAIL, { at: 0.78, offset: 7.5 });
 
+// Hoisted so the connector below can end on one of the circuit's own control
+// points rather than a typed-in coordinate that drifts when the circuit moves.
+const DESERT_CIRCUIT = circuitRoad({ halfX: 220, halfZ: 150, corner: 70 });
+
+// The dune trail and handling circuit used to be two separate road networks,
+// 283 m apart. Start the link on a dune-trail control point and finish on the
+// circuit's north-west corner so both joins land on an existing road surface.
+const DESERT_DUNE_LINK = [
+  roadPoint(DESERT_DUNE_TRAIL, 3),
+  { x: -190, z: 380 },
+  { x: -215, z: 285 },
+  { x: -175, z: 205 },
+  roadPoint(DESERT_CIRCUIT, 5),
+];
+
 /* -------------------------------------------------------------------------- */
 /*                        Modern City: the new layout                         */
 /* -------------------------------------------------------------------------- */
@@ -851,7 +866,7 @@ export const MAPS = [
       return [
         {
           name: 'handling-circuit',
-          points: circuitRoad({ halfX: 220, halfZ: 150, corner: 70 }),
+          points: DESERT_CIRCUIT,
           width: 12,
           closed: true,
           surface: 'asphalt',
@@ -870,6 +885,12 @@ export const MAPS = [
           name: 'dune-trail',
           points: DESERT_DUNE_TRAIL,
           width: 6,
+          surface: 'dirt',
+        },
+        {
+          name: 'dune-link',
+          points: DESERT_DUNE_LINK,
+          width: 7,
           surface: 'dirt',
         },
         {

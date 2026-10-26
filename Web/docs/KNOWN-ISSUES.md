@@ -5,25 +5,6 @@ is speculative, and nothing here is hidden in a comment somewhere instead.
 
 ## Functional gaps
 
-### The desert dune trail is a separate piece of road
-
-`tools/probe-road-connectivity.mjs` joins roads whose asphalt actually meets and
-reports which landmarks and spawn points end up on a piece nothing else reaches. Three of the four
-maps now come back connected — Alpine Valley's village and lakeside spurs and Coastal Highway's
-beach access each started 20–320 m short of the road they belong to, and now start on it. **Desert
-Proving Grounds does not**: `dune-trail` passes within 283 m of the handling circuit and touches
-nothing, so the jump ramp and the High Dunes are reached by driving across open sand rather than by
-following a road onto the trail.
-
-It is left that way deliberately for now. The map is an off-road proving ground where sand driving
-is the point, the ground between the two roads is dry and flat (12.9–17.4 m of dune, measured), and
-connecting them means adding roughly 640 m of new road that nothing has looked at. The measurement
-is here so the next person does not have to rediscover it:
-
-```bash
-node tools/probe-road-connectivity.mjs desert-proving-grounds   # exits 1
-```
-
 ### Traffic cannot path around an obstruction
 
 Traffic follows the road centreline, so its "avoidance" is to slow for whatever is beside it and
@@ -53,12 +34,6 @@ capped (14 at 100% density), but there is no reduced-detail representation for d
 
 `Space` locks the rear wheels fully. There is no analogue handbrake, so you cannot feather it.
 
-### No cockpit interior detail
-
-The cockpit camera is positioned correctly inside the bodywork, but there is no modelled interior
-— no dashboard, steering wheel, or mirrors. The chase and hood views are the ones that look
-finished.
-
 ### Challenges are still tied to one map each
 
 Nine challenges exist, each tied to one map, and starting one on another map loads that map rather
@@ -67,10 +42,11 @@ the active challenge's gates — but it is per-map, not a single overview of all
 
 ## Visual and audio limitations
 
-- **Bridges and tunnels exist, but only on the two maps that declare them.** Alpine Valley has two
-  tunnels and two viaducts, Coastal Highway has one of each, and the city and desert maps have
-  neither. Nothing is placed by hand: a road declares that it wants a structure and the terrain
-  decides where, so a road with nothing to span or bore gets no structure and says so in the console.
+- **Bridges and tunnels exist, but only on the three maps that declare them.** Alpine Valley and
+  Coastal Highway have two tunnels and two viaducts each; Modern City has one of each, and the desert
+  map has neither. Nothing is placed by hand: a road declares that it wants a structure and the
+  terrain decides where, so a road with nothing to span or bore gets no structure and says so in the
+  console.
 - **A structure's vertical alignment is a straight line.** The road inside a span is straightened
   between the two ends of its search window, with a sine crown across a bridge and nothing between
   them; it does not follow a grade change or a crest. The **plan** geometry is not straightened — a

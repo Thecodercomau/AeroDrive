@@ -80,7 +80,8 @@ Modern City Airfield Drift Loop challenge.
 off-road 4×4 — built from lofted geometry with independent wheels, working headlights and brake
 lights, and per-vehicle handling data. Front, rear and all-wheel drive, automatic and manual
 gearboxes, an engine torque curve, a clutch model, traction control, ABS, a stability assist,
-engine braking and handbrake rear-lock.
+engine braking and handbrake rear-lock. The player's car gets a modelled cockpit interior
+(dashboard, wheel, seats, console, door cards and mirror); traffic keeps the lighter exterior model.
 
 Only the hatchback and sedan are unlocked at first launch; the rest are unlocked by finishing
 challenges, so there is a reason to play them.
@@ -114,7 +115,7 @@ The road over the span is left completely ungraded, so a bridge spans the valley
 and a tunnel bores through intact hillside: a Rapier heightfield does not collide with anything
 beneath it (`tools/probe-heightfield-sides.mjs` demonstrates this), so the hill above a tunnel stays
 exactly as it was. A road with nothing to span gets no bridge and says so in the console instead.
-Alpine Valley has two of each, Coastal Highway one of each, and Modern City a tunnel under Eastgate
+Alpine Valley and Coastal Highway have two of each, and Modern City has a tunnel under Eastgate
 Ridge and a viaduct over the creek at Cinder Beach — all with decks, parapets, piers, abutments,
 portal surrounds and ceiling lamps — and real point lights inside the bore on every preset but
 Potato, spaced by the preset and capped at ten per map.
@@ -194,8 +195,8 @@ animation frame, so handling is identical on a 30 Hz laptop and a 240 Hz monitor
 ## Testing
 
 ```bash
-npm test                # 255 unit + integration tests
-npm run test:e2e        # 16 gameplay scenarios + touch and sub-path checks + a WebKit smoke test
+npm test                # 262 unit + integration tests
+npm run test:e2e        # 17 gameplay scenarios + touch and sub-path checks + a WebKit smoke test
 npm run test:e2e:webkit # WebKit only — Safari's engine
 npm run lint
 ```
@@ -215,9 +216,9 @@ stopped 20–320 m short of the road they belonged to, which is invisible on the
 a screenshot, and only noticed when you drive to the landmark the map promised and cross a strip of
 grass to get onto the road that serves it. They now start on the parent road's own geometry, and
 `tools/probe-road-connectivity.mjs` is the check that finds this class of defect: it joins roads whose
-asphalt actually meets and reports every landmark and spawn point on a piece nothing reaches. Desert
-Proving Grounds' dune trail is still a separate piece, deliberately — see
-[`docs/KNOWN-ISSUES.md`](docs/KNOWN-ISSUES.md).
+asphalt actually meets and reports every landmark and spawn point on a piece nothing reaches. All
+four maps now come back as a single connected network; Desert Proving Grounds gained a 302 m
+`dune-link` between the end of the dune trail and the handling circuit.
 
 The two that a player would have described as "the car is broken" were both in how the vehicle is
 driven rather than in what it is: Rapier's user forces and user torques are **separate accumulators**,
@@ -323,6 +324,6 @@ driving sandboxes but shares no code, model, map, sound or branding with any com
 
 See [`docs/KNOWN-ISSUES.md`](docs/KNOWN-ISSUES.md). The short version: there is still no damage
 _deformation_ — impacts accumulate a damage percentage that affects handling, but bodywork does not
-bend — bridges and tunnels exist but only on the two maps that declare them, and a tunnel is dark
+bend — bridges and tunnels exist only on the three maps that declare them, and a tunnel is dark
 unless the preset is Low or above. No GPU frame rate has been measured, so no FPS figure is claimed
 anywhere.
